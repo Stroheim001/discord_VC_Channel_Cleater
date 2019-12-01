@@ -1,0 +1,5 @@
+:icons: font
+
+# readme
+
+このbotは自動的にVCを生成しいなくなれば消えるためのbotです。
