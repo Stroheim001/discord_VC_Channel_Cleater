@@ -1,9 +1,13 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Discord.Commands;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Reflection;
 using YamlDotNet.RepresentationModel;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ban_account_bot
 {
@@ -22,9 +26,16 @@ namespace ban_account_bot
         private ulong channel;
 
         private ulong guild;
+
+        private char prefix = '!';
+
+        private static CommandService commands;
+        private static IServiceProvider services;
         public Bot()
         {
             discord = new DiscordSocketClient();
+            commands = new CommandService();
+            services = new ServiceCollection().BuildServiceProvider();
 
             discord.Log += log;
 
@@ -43,12 +54,16 @@ namespace ban_account_bot
 
             guild = ulong.Parse(guild_.Value);
 
+            commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+
             discord.LoginAsync(TokenType.Bot, token.Value);
 
-            discord.UserVoiceStateUpdated += onUserJoined;
+            discord.UserVoiceStateUpdated += onUserVCJoined;
+
+            discord.MessageReceived += onMessageRecieved;
         }
 
-        public async Task onUserJoined(SocketUser user, SocketVoiceState state1, SocketVoiceState state2)
+        public async Task onUserVCJoined(SocketUser user, SocketVoiceState state1, SocketVoiceState state2)
         {
             SocketGuild socketguild = discord.GetGuild(guild);
 
@@ -59,11 +74,26 @@ namespace ban_account_bot
                 await user_.ModifyAsync(x => x.ChannelId = Optional.Create(VC.Id));
             }
 
-            if (state1.VoiceChannel.Users.Count == 0 && state1.VoiceChannel.Id != channel)
+            if (state1.VoiceChannel != null && state1.VoiceChannel.Users.Count == 0 && state1.VoiceChannel.Id != channel)
             {
                 SocketVoiceChannel old_VC = (SocketVoiceChannel)discord.GetChannel(state1.VoiceChannel.Id);
                 await old_VC.DeleteAsync();
             }
+
+        }
+
+        public async Task onMessageRecieved(SocketMessage message_)
+        {
+            var message = message_ as SocketUserMessage;
+            int argPos = 0;
+
+            if (!(message.HasCharPrefix(prefix, ref argPos)))
+            {
+                return;
+            }
+            var context = new CommandContext(discord, message);
+
+            var result = await commands.ExecuteAsync(context, argPos, services);
 
         }
         public async Task keep()
