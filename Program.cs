@@ -59,6 +59,12 @@ namespace ban_account_bot
                 await user_.ModifyAsync(x => x.ChannelId = Optional.Create(VC.Id));
             }
 
+            if (state1.VoiceChannel.Users.Count == 0 && state1.VoiceChannel.Id != channel)
+            {
+                SocketVoiceChannel old_VC = (SocketVoiceChannel)discord.GetChannel(state1.VoiceChannel.Id);
+                await old_VC.DeleteAsync();
+            }
+
         }
         public async Task keep()
         {
