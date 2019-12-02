@@ -6,10 +6,11 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Reflection;
 using YamlDotNet.RepresentationModel;
+using System.Collections.Generic;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ban_account_bot
+namespace VoiceChannelCreater
 {
     class Program
     {
@@ -21,7 +22,7 @@ namespace ban_account_bot
     }
     class Bot
     {
-        private DiscordSocketClient discord;
+        public static DiscordSocketClient discord;
 
         private ulong channel;
 
@@ -31,8 +32,12 @@ namespace ban_account_bot
 
         private static CommandService commands;
         private static IServiceProvider services;
+
+        public static Dictionary<ulong, ulong> channel_list;
         public Bot()
         {
+            channel_list = new Dictionary<ulong, ulong>();
+
             discord = new DiscordSocketClient();
             commands = new CommandService();
             services = new ServiceCollection().BuildServiceProvider();
@@ -70,13 +75,20 @@ namespace ban_account_bot
             if (state2.VoiceChannel != null && state2.VoiceChannel.Id == channel)
             {
                 var VC = await socketguild.CreateVoiceChannelAsync(user.Username + "のチャンネル");
+                channel_list.Add(discord.CurrentUser.Id, VC.Id);
                 SocketGuildUser user_ = (SocketGuildUser)user;
                 await user_.ModifyAsync(x => x.ChannelId = Optional.Create(VC.Id));
+            }
+
+            if(state2.VoiceChannel != null && state1.VoiceChannel != null) {
+                channel_list.Remove(discord.CurrentUser.Id);
+                channel_list.Add(discord.CurrentUser.Id, state2.VoiceChannel.Id);
             }
 
             if (state1.VoiceChannel != null && state1.VoiceChannel.Users.Count == 0 && state1.VoiceChannel.Id != channel)
             {
                 SocketVoiceChannel old_VC = (SocketVoiceChannel)discord.GetChannel(state1.VoiceChannel.Id);
+                channel_list.Remove(old_VC.Id);
                 await old_VC.DeleteAsync();
             }
 
