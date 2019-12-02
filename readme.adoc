@@ -2,4 +2,10 @@
 
 # readme
 
-このbotは自動的にVCを生成しいなくなれば消えるためのbotです。
+このbotは自動的にVCを生成し、いなくなれば消えるためのbotです。
+
+TIP: 以下の要素を `data.yml` に追加してください
+
+. token Botのtoken
+. channel 新規作成したいときのチャンネルID
+. guild サーバのID
