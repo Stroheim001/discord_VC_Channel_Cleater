@@ -21,6 +21,17 @@ public class CommandList : ModuleBase
     }
 
     /// <summary>
+    /// 人数制限解除
+    /// </summary>
+    /// <returns>Task</returns>
+    [Command("unlimit")]
+    public async Task userUnlimit()
+    {
+        SocketVoiceChannel channel = (SocketVoiceChannel)Bot.discord.GetChannel(Bot.channel_list[Bot.discord.CurrentUser.Id]);
+        await channel.ModifyAsync(x => x.UserLimit = 99);
+    }
+
+    /// <summary>
     /// 名前の変更
     /// </summary>
     /// <param name="name">変更する名前</param>
