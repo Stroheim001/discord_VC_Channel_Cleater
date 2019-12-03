@@ -42,4 +42,12 @@ public class CommandList : ModuleBase
         SocketGuildChannel channel = (SocketGuildChannel)Bot.discord.GetChannel(Bot.channel_list[Bot.discord.CurrentUser.Id]);
         await channel.ModifyAsync(x => x.Name = name);
     }
+    [Command("help")]
+    public async Task showHelp()
+    {
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.Title = "Helpコマンド";
+        embed.Description = "!limit 人数 : 人数制限\n !unlimit : 人数制限解除\n !name チャンネル名 : チャンネル名変更\n !help : ヘルプコマンド";
+        await this.Context.Channel.SendMessageAsync("helpコマンド", false, embed.Build());
+    }
 }
