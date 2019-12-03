@@ -26,6 +26,8 @@ namespace VoiceChannelCreater
 
         private ulong channel;
 
+        private List<ulong> non_erase_channel;
+
         private ulong guild;
 
         private char prefix = '!';
@@ -59,6 +61,14 @@ namespace VoiceChannelCreater
 
             guild = ulong.Parse(guild_.Value);
 
+            non_erase_channel = new List<ulong>();
+
+            non_erase_channel.Add(649456868141563944);
+            non_erase_channel.Add(649457149239623690);
+            non_erase_channel.Add(649457299886309377);
+            non_erase_channel.Add(649462142487101461);
+            non_erase_channel.Add(649474051982622720);
+
             commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
             discord.LoginAsync(TokenType.Bot, token.Value);
@@ -72,6 +82,8 @@ namespace VoiceChannelCreater
         {
             SocketGuild socketguild = discord.GetGuild(guild);
 
+            deleteChannel(user, state1, state2);
+
             if (state2.VoiceChannel != null && state2.VoiceChannel.Id == channel)
             {
                 var VC = await socketguild.CreateVoiceChannelAsync(user.Username + "のチャンネル");
@@ -80,16 +92,28 @@ namespace VoiceChannelCreater
                 await user_.ModifyAsync(x => x.ChannelId = Optional.Create(VC.Id));
             }
 
-            if(state2.VoiceChannel != null && state1.VoiceChannel != null) {
-                channel_list.Remove(discord.CurrentUser.Id);
-                channel_list.Add(discord.CurrentUser.Id, state2.VoiceChannel.Id);
-            }
+        }
 
+        async public void deleteChannel(SocketUser user, SocketVoiceState state1, SocketVoiceState state2)
+        {
             if (state1.VoiceChannel != null && state1.VoiceChannel.Users.Count == 0 && state1.VoiceChannel.Id != channel)
             {
                 SocketVoiceChannel old_VC = (SocketVoiceChannel)discord.GetChannel(state1.VoiceChannel.Id);
-                channel_list.Remove(old_VC.Id);
-                await old_VC.DeleteAsync();
+
+                foreach (var tmp in non_erase_channel)
+                {
+                    if (tmp == old_VC.Id) return;
+                }
+
+                if (channel_list.Remove(old_VC.Id))
+                {
+                    await old_VC.DeleteAsync();
+                }
+                else
+                {
+                    channel_list.Clear();
+                    await old_VC.DeleteAsync();
+                }
             }
 
         }
