@@ -70,6 +70,7 @@ namespace VoiceChannelCreater
             non_erase_channel.Add(649474051982622720);
             non_erase_channel.Add(666177210394214401);
             non_erase_channel.Add(667613291606048768);
+            non_erase_channel.Add(668243655781384251);
 
             commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
