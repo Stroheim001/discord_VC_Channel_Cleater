@@ -35,11 +35,8 @@ namespace VoiceChannelCreater
         private static CommandService commands;
         private static IServiceProvider services;
 
-        public static Dictionary<ulong, ulong> channel_list;
         public Bot()
         {
-            channel_list = new Dictionary<ulong, ulong>();
-
             discord = new DiscordSocketClient();
             commands = new CommandService();
             services = new ServiceCollection().BuildServiceProvider();
@@ -90,7 +87,6 @@ namespace VoiceChannelCreater
             if (state2.VoiceChannel != null && state2.VoiceChannel.Id == channel)
             {
                 var VC = await socketguild.CreateVoiceChannelAsync(user.Username + "のチャンネル");
-                channel_list.Add(discord.CurrentUser.Id, VC.Id);
                 SocketGuildUser user_ = (SocketGuildUser)user;
                 await user_.ModifyAsync(x => x.ChannelId = Optional.Create(VC.Id));
             }
@@ -107,16 +103,7 @@ namespace VoiceChannelCreater
                 {
                     if (tmp == old_VC.Id) return;
                 }
-
-                if (channel_list.Remove(old_VC.Id))
-                {
-                    await old_VC.DeleteAsync();
-                }
-                else
-                {
-                    channel_list.Clear();
-                    await old_VC.DeleteAsync();
-                }
+                await old_VC.DeleteAsync();
             }
 
         }
