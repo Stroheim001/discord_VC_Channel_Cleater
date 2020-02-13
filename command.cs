@@ -16,7 +16,7 @@ public class CommandList : ModuleBase
     [Command("limit")]
     public async Task userLimit(int limit)
     {
-        SocketVoiceChannel channel = (SocketVoiceChannel)this.Context.Message.Channel;
+        var channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
         await channel.ModifyAsync(x => x.UserLimit = limit);
     }
 
@@ -27,7 +27,7 @@ public class CommandList : ModuleBase
     [Command("unlimit")]
     public async Task userUnlimit()
     {
-        SocketVoiceChannel channel = (SocketVoiceChannel)this.Context.Message.Channel;
+        var channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
         await channel.ModifyAsync(x => x.UserLimit = 99);
     }
 
