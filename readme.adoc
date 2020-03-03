@@ -9,3 +9,5 @@ TIP: 以下の要素を `data.yml` に追加してください
 . token Botのtoken
 . channel 新規作成したいときのチャンネルID
 . guild サーバのID
+
+招待URL: https://discordapp.com/api/oauth2/authorize?client_id=650561176794824734&permissions=6160&scope=bot
